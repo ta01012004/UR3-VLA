@@ -1,0 +1,13 @@
+# Generated RLBench/CoppeliaSim artifacts
+rlbench_hpc_smoke_test/outputs/
+rlbench_hpc_smoke_test/third_party/
+rlbench_hpc_smoke_test/rlbench-video-*.out
+rlbench_hpc_smoke_test/rlbench-video-*.err
+
+# Python/cache
+__pycache__/
+*.py[cod]
+
+# Environments
+.venv/
+.env

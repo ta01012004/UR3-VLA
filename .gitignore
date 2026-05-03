@@ -11,3 +11,12 @@ __pycache__/
 # Environments
 .venv/
 .env
+outputs/
+datasets/
+checkpoints/
+*.out
+*.err
+__pycache__/
+*.pyc
+.claude/
+third_party/

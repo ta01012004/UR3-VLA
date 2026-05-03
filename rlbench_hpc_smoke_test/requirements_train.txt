@@ -1,0 +1,8 @@
+# Extra dependency for the baseline VLA action-head trainer.
+# Install a CUDA or CPU wheel depending on your HPC.
+
+# CUDA 12.1 example:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# CPU-only example:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu

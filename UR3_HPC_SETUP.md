@@ -102,35 +102,93 @@ source install/setup.bash
 
 ### Cách B: HPC không có ROS2 hoặc không có sudo
 
-Dùng container ROS2. Ví dụ với Apptainer:
+Dùng Apptainer với image ROS2 Humble đã cài sẵn dependency cho Universal Robots driver.
+Không nên dùng trực tiếp `docker://osrf/ros:humble-desktop` để build `ur_ws`, vì image gốc thường thiếu `ros2_control` và sẽ lỗi kiểu:
+
+```text
+Could not find a package configuration file provided by "controller_interface"
+```
+
+#### B1. Build image Apptainer mới
+
+Repo có sẵn definition file:
+
+```text
+containers/ros_humble_ur.def
+```
+
+Trên HPC:
 
 ```bash
 mkdir -p ~/containers
 cd ~/containers
-apptainer pull ros_humble.sif docker://osrf/ros:humble-desktop
+
+# Nếu đang ở thư mục repo UR3-VLA, có thể copy file def từ repo:
+cp /path/to/UR3-VLA/containers/ros_humble_ur.def ./ros_humble_ur.def
+
+apptainer build --fakeroot ros_humble_ur.sif ros_humble_ur.def
 ```
 
-Chạy shell trong container:
+Nếu HPC không cho `--fakeroot`, thử build sandbox writable:
+
+```bash
+apptainer build --sandbox --fakeroot ros_humble_ur_sandbox ros_humble_ur.def
+apptainer build ros_humble_ur.sif ros_humble_ur_sandbox
+```
+
+Nếu cả hai cách đều bị chặn, cần nhờ admin build image hoặc build ở máy khác rồi upload `ros_humble_ur.sif` lên HPC.
+
+#### B2. Vào container mới
 
 ```bash
 apptainer shell --nv \
   --bind /home/$USER:/home/$USER \
-  ~/containers/ros_humble.sif
+  ~/containers/ros_humble_ur.sif
 ```
 
 Trong container:
 
 ```bash
 source /opt/ros/humble/setup.bash
+ros2 pkg prefix controller_interface
+```
+
+Nếu lệnh trên in ra `/opt/ros/humble`, dependency `controller_interface` đã có.
+
+#### B3. Clone và build UR workspace
+
+```bash
+source /opt/ros/humble/setup.bash
 mkdir -p ~/ur_ws/src
 cd ~/ur_ws/src
+
 git clone https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver.git
 git clone https://github.com/UniversalRobots/Universal_Robots_ROS2_Description.git
+
 cd ~/ur_ws
 rosdep update
-rosdep install --ignore-src --from-paths src -y
+rosdep install --ignore-src --from-paths src -y -r
+
 colcon build
 source install/setup.bash
+```
+
+#### B4. Nếu vẫn lỗi thiếu package
+
+Kiểm tra package thiếu, ví dụ:
+
+```bash
+ros2 pkg prefix controller_interface
+ros2 pkg prefix control_msgs
+ros2 pkg prefix controller_manager
+```
+
+Nếu package nào không có, thêm package apt tương ứng vào `containers/ros_humble_ur.def`, build lại image, rồi clean build workspace:
+
+```bash
+cd ~/ur_ws
+rm -rf build install log
+colcon build
 ```
 
 ## 5. Setup UR3 thật

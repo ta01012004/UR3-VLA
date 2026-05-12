@@ -8,6 +8,8 @@ Repo này lưu script và hướng dẫn phục vụ thử nghiệm UR3/VLA trê
 README.md
 COPPELIASIM_RLBENCH_SETUP.md
 UR3_HPC_SETUP.md
+containers/
+  ros_humble_ur.def
 rlbench_hpc_smoke_test/
   install_hpc.sh
   requirements.txt
@@ -57,6 +59,7 @@ demos = task.get_demos(1, live_demos=True)
 
 - `COPPELIASIM_RLBENCH_SETUP.md`: hướng dẫn chi tiết cài và chạy CoppeliaSim/RLBench trên HPC.
 - `UR3_HPC_SETUP.md`: hướng dẫn setup UR3/ROS2/RTDE/VLA và hướng kết nối sang robot thật.
+- `containers/ros_humble_ur.def`: Apptainer definition cho ROS2 Humble + Universal Robots dependencies (`ros2_control`, `controller_interface`, MoveIt, colcon). Dùng file này thay cho image ROS Humble gốc nếu build `ur_ws` bị lỗi thiếu `controller_interface`.
 
 ## Ghi chú
 

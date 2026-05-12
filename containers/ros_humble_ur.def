@@ -1,0 +1,26 @@
+﻿Bootstrap: docker
+From: osrf/ros:humble-desktop
+
+%post
+    apt-get update
+    apt-get install -y \
+        git \
+        python3-pip \
+        python3-rosdep \
+        python3-colcon-common-extensions \
+        ros-humble-ros2-control \
+        ros-humble-ros2-controllers \
+        ros-humble-controller-manager \
+        ros-humble-control-msgs \
+        ros-humble-joint-state-broadcaster \
+        ros-humble-joint-trajectory-controller \
+        ros-humble-xacro \
+        ros-humble-rviz2 \
+        ros-humble-moveit \
+        && rm -rf /var/lib/apt/lists/*
+
+    rosdep init || true
+    rosdep update || true
+
+%environment
+    source /opt/ros/humble/setup.bash
